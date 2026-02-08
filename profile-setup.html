@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ตั้งค่าโปรไฟล์</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&family=Athiti:wght@600&family=Kanit&family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Segoe UI',sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0a0a0a,#1a1a2e);
+  color:#fff;
+  padding: 20px;
+}
+
+body:lang(th) {
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.profile-container{
+  background:rgba(30,30,30,.95);
+  padding:40px;
+  width:100%;
+  max-width:420px;
+  border-radius:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 26px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-group{margin-bottom:18px}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#aaa;
+  font-size:14px;
+}
+
+input, select{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #333;
+  background:#1a1a2e;
+  color:#fff;
+  font-size:15px;
+}
+
+input:focus, select:focus{
+  outline:none;
+  border-color:#667eea;
+}
+
+select option{
+  background:#1a1a2e;
+  color:#fff;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+.footer-text{
+  position:fixed;
+  bottom:12px;
+  right:20px;
+  font-size:12px;
+  color:#777;
+}
+
+.custom-select {
+  position: relative;
+}
+
+.selected {
+  padding: 14px;
+  border-radius: 10px;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.options {
+  position: absolute;
+  width: 100%;
+  top: 110%;
+  left: 0;
+  background: #1a1a2e;
+  border-radius: 10px;
+  overflow: hidden;
+
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.options div {
+  padding: 14px;
+  cursor: pointer;
+}
+
+.options div:hover {
+  background: #2a2a3e;
+}
+
+.custom-select.open .options {
+  max-height: 200px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.custom-select {
+  position: relative;
+}
+
+.custom-select .selected {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: #1a1a2e;
+  cursor: pointer;
+}
+
+.custom-select .options {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #1a1a2e;
+  border-radius: 10px;
+  overflow: hidden;
+
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+  z-index: 10;
+}
+
+.custom-select .options div {
+  padding: 14px;
+  cursor: pointer;
+}
+
+.custom-select .options div:hover {
+  background: #2a2a3e;
+}
+
+.custom-select.open .options {
+  max-height: 200px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div class="profile-container">
+  <h2>ตั้งค่าโปรไฟล์</h2>
+
+  <form id="profileForm">
+    <div class="form-group">
+      <label>ชื่อที่แสดง</label>
+      <input type="text" id="displayName" required>
+    </div>
+
+    <div class="form-group"> 
+      <label>เพศ</label> 
+      <div class="custom-select">
+        <div class="selected" id="genderSelected">
+          เลือกเพศ
+        </div>
+        <div class="options" id="genderOptions">
+          <div data-value="male">ชาย</div>
+          <div data-value="female">หญิง</div>
+          <div data-value="other">ไม่ระบุ</div>
+        </div>
+      </div>
+
+      <input type="hidden" id="gender" name="gender">
+    </div>
+
+
+
+    <div class="form-group">
+      <label>วันเกิด</label>
+      <input type="date" id="birthdate" required>
+    </div>
+
+    <div class="form-group">
+      <label>สถานที่ (ภาษาอังกฤษเท่านั้น)</label>
+      <input type="text" id="location" placeholder="ชื่อเมือง เช่น Khon Kaen" required>
+    </div>
+
+    <div class="form-group">
+      <label>โรคประจำตัว</label>
+      <input 
+        type="text" 
+        id="chronicDisease" 
+        placeholder="ถ้าไม่มีให้พิมพ์ - หรือ ไม่มี">
+    </div>
+
+
+    <button type="submit" id="submitBtn">บันทึกข้อมูล</button>
+  </form>
+</div>
+
+<div class="footer-text">© presented by klabot dev team</div>
+
+<script>
+const supabaseClient = supabase.createClient(
+  "https://zmusdfezopzhrjmmtleo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptdXNkZmV6b3B6aHJqbW10bGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTI2MTksImV4cCI6MjA4Mzg4ODYxOX0.tzmdjzoYqrBn5Q6tU9d3zLOMFA8qnFX-obYW2HKXWfM"
+);
+
+// ตรวจสอบว่ามีผู้ใช้ login อยู่หรือไม่
+async function checkAuth() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  
+  if (!user) {
+    alert('กรุณาเข้าสู่ระบบก่อน');
+    window.location.href = 'login.html';
+    return null;
+  }
+  
+  return user;
+}
+
+const select = document.querySelector('.custom-select');
+const selected = document.getElementById('genderSelected');
+const options = document.getElementById('genderOptions');
+const hiddenInput = document.getElementById('gender');
+
+selected.addEventListener('click', () => {
+  select.classList.toggle('open');
+});
+
+options.querySelectorAll('div').forEach(option => {
+  option.addEventListener('click', () => {
+    selected.textContent = option.textContent;
+    hiddenInput.value = option.dataset.value;
+    select.classList.remove('open');
+  });
+});
+
+// ปิดเมื่อคลิกนอก
+document.addEventListener('click', e => {
+  if (!select.contains(e.target)) {
+    select.classList.remove('open');
+  }
+});
+
+
+const genderSelect = document.getElementById('genderSelect');
+const genderSelected = genderSelect.querySelector('.selected');
+const genderOptions = genderSelect.querySelectorAll('.options div');
+const genderInput = document.getElementById('gender');
+
+genderSelected.addEventListener('click', () => {
+  genderSelect.classList.toggle('open');
+});
+
+genderOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    genderSelected.textContent = option.textContent;
+    genderInput.value = option.dataset.value;
+    genderSelect.classList.remove('open');
+  });
+});
+
+// คลิกนอก dropdown ให้ปิด
+document.addEventListener('click', e => {
+  if (!genderSelect.contains(e.target)) {
+    genderSelect.classList.remove('open');
+  }
+});
+
+
+
+document.getElementById('profileForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'กำลังบันทึก...';
+
+  const user = await checkAuth();
+  if (!user) return;
+
+  const displayName = document.getElementById('displayName').value.trim();
+  const gender = document.getElementById('gender').value;
+  const birthdate = document.getElementById('birthdate').value;
+  const location = document.getElementById('location').value.trim();
+  const chronicDisease = document.getElementById('chronicDisease').value.trim();
+
+
+  // บันทึกข้อมูลลงใน table personal_info (คุณต้องสร้าง table นี้ใน Supabase)
+    const age = calculateAge(birthdate);
+
+    const { data, error } = await supabaseClient
+    .from('personal_info')
+    .insert([
+        {
+        Display_name: displayName,
+        gender: gender,
+        birth: birthdate,
+        place: location,
+        age: age
+        }
+    ]);
+
+
+  if (error) {
+    console.error('Error:', error);
+    alert('เกิดข้อผิดพลาด: ' + error.message);
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'บันทึกข้อมูล';
+    return;
+  }
+
+  alert('บันทึกข้อมูลสำเร็จ!');
+  // นำทางไปหน้าหลักหรือหน้า dashboard
+  window.location.href = 'index.html'; // เปลี่ยนเป็นหน้าที่คุณต้องการ
+});
+
+function calculateAge(birthDate) {
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// เรียกใช้เมื่อโหลดหน้า
+checkAuth();
+</script>
+
+</body>
+</html>

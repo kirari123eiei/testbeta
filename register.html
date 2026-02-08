@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Register</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&family=Athiti:wght@600&family=Kanit&family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#0a0a0a,#1a1a2e);
+  color:#fff;
+}
+
+body:lang(th) {
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.register-container{
+  background:rgba(30,30,30,.95);
+  padding:40px;
+  width:100%;
+  max-width:420px;
+  border-radius:20px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 26px;
+
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+
+.form-group{margin-bottom:18px}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#aaa;
+  font-size:14px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #333;
+  background:#1a1a2e;
+  color:#fff;
+  font-size:15px;
+}
+
+input:focus{
+  outline:none;
+  border-color:#667eea;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+}
+
+.register-link{
+  text-align:center;
+  margin-top:18px;
+}
+
+.register-link a{
+  color:#9aa5ff;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.register-link a:hover{text-decoration:underline}
+
+.footer-text{
+  position:fixed;
+  bottom:12px;
+  right:20px;
+  font-size:12px;
+  color:#777;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<div class="register-container">
+  <h2>สร้างบัญชี</h2>
+
+  <form id="registerForm">
+    <div class="form-group">
+      <label>อีเมล</label>
+      <input type="email" id="email" required>
+    </div>
+
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="password" required>
+    </div>
+
+    <div class="form-group">
+      <label>ยืนยันรหัสผ่าน</label>
+      <input type="password" id="confirmPassword" required>
+    </div>
+
+    <button type="submit">Create Account</button>
+  </form>
+
+  <div class="register-link">
+    <a href="login.html">กลับไปหน้า Login</a>
+  </div>
+</div>
+
+<div class="footer-text">© presented by klabot dev team</div>
+
+<script>
+const supabaseClient = supabase.createClient(
+  "https://zmusdfezopzhrjmmtleo.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptdXNkZmV6b3B6aHJqbW10bGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTI2MTksImV4cCI6MjA4Mzg4ODYxOX0.tzmdjzoYqrBn5Q6tU9d3zLOMFA8qnFX-obYW2HKXWfM"
+);
+
+document.getElementById('registerForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+  if (password !== confirmPassword) {
+    alert('รหัสผ่านไม่ตรงกัน');
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert('ลงทะเบียนสำเร็จ!');
+  window.location.href = 'profile-setup.html';
+});
+
+</script>
+
+</body>
+</html>
