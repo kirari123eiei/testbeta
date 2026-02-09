@@ -258,19 +258,18 @@ const supabaseClient = supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InptdXNkZmV6b3B6aHJqbW10bGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTI2MTksImV4cCI6MjA4Mzg4ODYxOX0.tzmdjzoYqrBn5Q6tU9d3zLOMFA8qnFX-obYW2HKXWfM"
 );
 
-// ตรวจสอบว่ามีผู้ใช้ login อยู่หรือไม่
+/* ---------- Auth ---------- */
 async function checkAuth() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  
-  if (!user) {
+  const { data } = await supabaseClient.auth.getUser();
+  if (!data.user) {
     alert('กรุณาเข้าสู่ระบบก่อน');
     window.location.href = 'login.html';
     return null;
   }
-  
-  return user;
+  return data.user;
 }
 
+/* ---------- Gender Dropdown ---------- */
 const select = document.querySelector('.custom-select');
 const selected = document.getElementById('genderSelected');
 const options = document.getElementById('genderOptions');
@@ -288,100 +287,71 @@ options.querySelectorAll('div').forEach(option => {
   });
 });
 
-// ปิดเมื่อคลิกนอก
 document.addEventListener('click', e => {
   if (!select.contains(e.target)) {
     select.classList.remove('open');
   }
 });
 
-
-const genderSelect = document.getElementById('genderSelect');
-const genderSelected = genderSelect.querySelector('.selected');
-const genderOptions = genderSelect.querySelectorAll('.options div');
-const genderInput = document.getElementById('gender');
-
-genderSelected.addEventListener('click', () => {
-  genderSelect.classList.toggle('open');
-});
-
-genderOptions.forEach(option => {
-  option.addEventListener('click', () => {
-    genderSelected.textContent = option.textContent;
-    genderInput.value = option.dataset.value;
-    genderSelect.classList.remove('open');
-  });
-});
-
-// คลิกนอก dropdown ให้ปิด
-document.addEventListener('click', e => {
-  if (!genderSelect.contains(e.target)) {
-    genderSelect.classList.remove('open');
-  }
-});
-
-
-
-document.getElementById('profileForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  
-  const submitBtn = document.getElementById('submitBtn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'กำลังบันทึก...';
-
-  const user = await checkAuth();
-  if (!user) return;
-
-  const displayName = document.getElementById('displayName').value.trim();
-  const gender = document.getElementById('gender').value;
-  const birthdate = document.getElementById('birthdate').value;
-  const location = document.getElementById('location').value.trim();
-  const chronicDisease = document.getElementById('chronicDisease').value.trim();
-
-
-  // บันทึกข้อมูลลงใน table personal_info (คุณต้องสร้าง table นี้ใน Supabase)
-    const age = calculateAge(birthdate);
-
-    const { data, error } = await supabaseClient
-    .from('personal_info')
-    .insert([
-        {
-        Display_name: displayName,
-        gender: gender,
-        birth: birthdate,
-        place: location,
-        age: age
-        }
-    ]);
-
-
-  if (error) {
-    console.error('Error:', error);
-    alert('เกิดข้อผิดพลาด: ' + error.message);
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'บันทึกข้อมูล';
-    return;
-  }
-
-  alert('บันทึกข้อมูลสำเร็จ!');
-  // นำทางไปหน้าหลักหรือหน้า dashboard
-  window.location.href = 'index.html'; // เปลี่ยนเป็นหน้าที่คุณต้องการ
-});
-
+/* ---------- Age ---------- */
 function calculateAge(birthDate) {
   const today = new Date();
   const birth = new Date(birthDate);
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
   return age;
 }
 
-// เรียกใช้เมื่อโหลดหน้า
+/* ---------- Submit ---------- */
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'กำลังบันทึก...';
+
+  const user = await checkAuth();
+  if (!user) return;
+
+  const displayName = document.getElementById('displayName').value.trim();
+  const gender = hiddenInput.value;
+  const birthdate = document.getElementById('birthdate').value;
+  const location = document.getElementById('location').value.trim();
+
+  if (!displayName || !gender || !birthdate) {
+    alert('กรุณากรอกข้อมูลให้ครบ');
+    btn.disabled = false;
+    btn.textContent = 'บันทึกข้อมูล';
+    return;
+  }
+
+  const age = calculateAge(birthdate);
+
+  const { error } = await supabaseClient
+    .from('personal_info')
+    .insert([{
+      Display_name: displayName,
+      gender: gender,
+      birth: birthdate,
+      place: location,
+      age: age
+    }]);
+
+  if (error) {
+    alert(error.message);
+    btn.disabled = false;
+    btn.textContent = 'บันทึกข้อมูล';
+    return;
+  }
+
+  alert('บันทึกข้อมูลสำเร็จ!');
+  window.location.href = 'index.html';
+});
+
 checkAuth();
 </script>
+
 
 </body>
 </html>
